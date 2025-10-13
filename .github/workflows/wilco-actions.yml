@@ -13,6 +13,7 @@ jobs:
       postgres:
         image: postgres:13
         env:
+          POSTGRES_USER: root
           POSTGRES_PASSWORD: postgres
           SECRET_KEY: secret
           POSTGRES_DB: anythink-market
@@ -40,6 +41,17 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
+
+      - name: Install Node.js dependencies
+        run: |
+          cd node-server
+          yarn install
+
+      - name: Start Node.js server
+        run: |
+          cd node-server
+          nohup yarn start &
+          sleep 10
 
       - name: Wilco checks
         id: Wilco
