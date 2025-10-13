@@ -41,6 +41,20 @@ jobs:
         with:
           node-version: "16"
 
+      - name: Start Docker Compose services
+        run: docker-compose up -d
+
+      - name: Wait for Node.js server
+        run: |
+          for i in {1..10}; do
+            if curl -s http://localhost:8001 | grep OK; then
+              echo "Node.js server is up!"
+              break
+            fi
+            echo "Waiting for Node.js server..."
+            sleep 2
+          done
+
       - name: Wilco checks
         id: Wilco
         uses: trywilco/actions@main
