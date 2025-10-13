@@ -13,6 +13,7 @@ jobs:
       postgres:
         image: postgres:13
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           SECRET_KEY: secret
           POSTGRES_DB: anythink-market
@@ -40,6 +41,45 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
+
+      - name: Install Python dependencies
+        run: |
+          cd python-server
+          pip install -r requirements.txt
+
+      - name: Install Node.js dependencies
+        run: |
+          cd node-server
+          npm install
+
+      - name: Start Python server
+        run: |
+          cd python-server
+          nohup python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 &
+          # Wait for Python server to start
+          until nc -z localhost 8000; do 
+            echo "Waiting for Python server on port 8000..."
+            sleep 2
+          done
+          echo "Python server is running on port 8000"
+
+      - name: Start Node.js server
+        run: |
+          cd node-server
+          nohup node index.js &
+          # Wait for Node.js server to start
+          until nc -z localhost 8001; do 
+            echo "Waiting for Node.js server on port 8001..."
+            sleep 2
+          done
+          echo "Node.js server is running on port 8001"
+
+      - name: Verify servers are running
+        run: |
+          echo "Testing Python server..."
+          curl -f http://localhost:8000 || echo "Python server check failed"
+          echo "Testing Node.js server..."
+          curl -f http://localhost:8001 || echo "Node.js server check failed"
 
       - name: Wilco checks
         id: Wilco
