@@ -4,6 +4,7 @@ This project contains both a Python FastAPI server and a Node.js Express server 
 
 ## Project Structure
 
+
 The project has the following files and directories:
 
 ### Python Server (Legacy)
